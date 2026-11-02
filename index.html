@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>БукЛайн — Онлайн-каталог и трекер чтения</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        paper: {
+                            50: '#fdfbf7',
+                            100: '#f7f2ea',
+                            200: '#eee3d3',
+                            800: '#2c2520',
+                            900: '#1c1613'
+                        },
+                        amberAccent: {
+                            DEFAULT: '#d97706',
+                            hover: '#b45309'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['Lora', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        h1, h2, h3, .font-serif {
+            font-family: 'Lora', serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d97706;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="bg-paper-50 dark:bg-paper-900 text-paper-800 dark:text-gray-100 min-h-screen flex flex-col transition-colors duration-300">
+
+    <!-- HEADER & NAVIGATION -->
+    <header class="sticky top-0 z-40 bg-paper-50/90 dark:bg-paper-900/90 backdrop-blur-md border-b border-paper-200 dark:border-paper-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amberAccent text-white flex items-center justify-center shadow-md">
+                    <i data-lucide="book-open" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <span class="font-serif text-2xl font-bold tracking-tight block">БукЛайн</span>
+                    <span class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-widest font-semibold block -mt-1">Книжный оазис</span>
+                </div>
+            </a>
+
+            <!-- Search Input -->
+            <div class="flex-1 max-w-md mx-4 hidden md:block">
+                <div class="relative">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="searchInput" placeholder="Поиск книги, автора или жанра..." 
+                        class="w-full pl-10 pr-4 py-2 text-sm rounded-full bg-white dark:bg-paper-800 border border-paper-200 dark:border-paper-800 focus:outline-none focus:ring-2 focus:ring-amberAccent">
+                </div>
+            </div>
+
+            <!-- Nav Items & Tools -->
+            <div class="flex items-center gap-4">
+                <nav class="hidden lg:flex items-center gap-6 text-sm font-semibold">
+                    <a href="#hero" class="hover:text-amberAccent transition-colors">Главная</a>
+                    <a href="#catalog" class="hover:text-amberAccent transition-colors">Каталог</a>
+                    <a href="#shelf" class="hover:text-amberAccent transition-colors">Моя полка</a>
+                </nav>
+
+                <!-- Theme Switcher -->
+                <button id="themeToggle" aria-label="Сменить тему" class="p-2.5 rounded-full hover:bg-paper-200 dark:hover:bg-paper-800 transition-colors">
+                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block text-amber-400"></i>
+                    <i data-lucide="moon" class="w-5 h-5 block dark:hidden text-gray-600"></i>
+                </button>
+
+                <!-- Wishlist Quick View Button -->
+                <a href="#shelf" class="relative p-2.5 rounded-full hover:bg-paper-200 dark:hover:bg-paper-800 transition-colors" title="Избранное">
+                    <i data-lucide="bookmark" class="w-5 h-5 text-amberAccent"></i>
+                    <span id="wishlistCountBadge" class="absolute -top-1 -right-1 bg-amberAccent text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        <!-- HERO SECTION: BOOK OF THE MONTH -->
+        <section id="hero" class="py-12 bg-gradient-to-b from-amber-500/10 to-transparent dark:from-amber-900/10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white dark:bg-paper-800 rounded-3xl p-6 sm:p-10 border border-paper-200 dark:border-paper-800 shadow-xl grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+                    
+                    <div class="md:col-span-4 flex justify-center">
+                        <div class="relative w-52 sm:w-64 aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl border-4 border-white dark:border-paper-900">
+                            <img id="heroCover" src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=600" alt="Книга месяца" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-amberAccent text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Выбор редакции</span>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-8 space-y-4">
+                        <div class="flex items-center gap-2 text-xs font-bold text-amberAccent uppercase tracking-widest">
+                            <i data-lucide="star" class="w-4 h-4 fill-amberAccent"></i> Книга месяца
+                        </div>
+                        <h1 id="heroTitle" class="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">1984</h1>
+                        <p id="heroAuthor" class="text-lg text-amberAccent font-medium">Джордж Оруэлл</p>
+                        
+                        <blockquote class="italic text-gray-600 dark:text-gray-300 border-l-4 border-amberAccent pl-4 py-1 text-sm sm:text-base">
+                            «Свобода — это возможность сказать, что дважды два — четыре. Если позволено это, все остальное отсюда следует.»
+                        </blockquote>
+
+                        <p id="heroDesc" class="text-sm text-gray-500 dark:text-gray-400 line-clamp-3">
+                            Культовый роман-антиутопия о тоталитарной системе, где контролируется не только каждое действие, но и каждая мысль человека.
+                        </p>
+
+                        <div class="pt-4 flex flex-wrap gap-4">
+                            <button onclick="openModal('3')" class="px-6 py-3 rounded-xl bg-amberAccent hover:bg-amberAccent-hover text-white font-semibold transition-all flex items-center gap-2 shadow-lg shadow-amberAccent/20">
+                                <i data-lucide="book-open" class="w-5 h-5"></i> Читать подробнее
+                            </button>
+                            <button onclick="toggleWishlist('3')" class="px-6 py-3 rounded-xl border border-paper-200 dark:border-paper-700 font-semibold hover:bg-paper-100 dark:hover:bg-paper-900 transition-colors">
+                                + В избранное
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- CATALOG SECTION -->
+        <section id="catalog" class="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+                <div>
+                    <h2 class="text-3xl font-bold font-serif">Каталог книг</h2>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Исследуйте лучшие произведения разных жанров</p>
+                </div>
+
+                <!-- Genre Filters -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar" id="categoryTabs">
+                    <!-- Dynamic categories via JS -->
+                </div>
+            </div>
+
+            <!-- Books Grid -->
+            <div id="booksGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Rendered dynamically -->
+            </div>
+        </section>
+
+        <!-- MY SHELF & READING GOAL TRACKER -->
+        <section id="shelf" class="py-16 bg-paper-100 dark:bg-paper-800/50 border-t border-paper-200 dark:border-paper-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                
+                <!-- Goal Tracker -->
+                <div class="bg-white dark:bg-paper-800 rounded-3xl p-6 sm:p-8 border border-paper-200 dark:border-paper-700 shadow-md">
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                        <div class="md:col-span-5 space-y-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-amberAccent">Личный челендж</span>
+                            <h3 class="text-2xl font-bold font-serif">Цель чтения на 2026 год</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Отмечайте прочитанные книги и достигайте новых результатов!</p>
+                        </div>
+
+                        <div class="md:col-span-7 space-y-4">
+                            <div class="flex justify-between items-end">
+                                <span class="font-serif text-3xl font-bold"><span id="readCount">0</span> / <span id="goalTarget">20</span> книг</span>
+                                <span id="goalPercent" class="text-xl font-bold text-amberAccent">0%</span>
+                            </div>
+                            <!-- Progress Bar -->
+                            <div class="w-full h-4 bg-paper-200 dark:bg-paper-900 rounded-full overflow-hidden">
+                                <div id="goalProgressBar" class="h-full bg-amberAccent transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Wishlist / My Shelf -->
+                <div>
+                    <h3 class="text-2xl font-bold font-serif mb-6 flex items-center gap-2">
+                        <i data-lucide="bookmark" class="w-6 h-6 text-amberAccent"></i> Моя полка (Избранное)
+                    </h3>
+                    <div id="wishlistGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white dark:bg-paper-900 border-t border-paper-200 dark:border-paper-800 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-gray-500 dark:text-gray-400 space-y-2">
+            <p>© 2026 БукЛайн. Готов к развертыванию на GitHub Pages.</p>
+            <p class="text-[10px]">Все права на книги принадлежат их авторам.</p>
+        </div>
+    </footer>
+
+    <!-- MODAL WINDOW FOR BOOK DETAILS -->
+    <div id="bookModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="bg-white dark:bg-paper-800 w-full max-w-2xl rounded-3xl shadow-2xl border border-paper-200 dark:border-paper-700 overflow-hidden relative max-h-[90vh] flex flex-col">
+            <button onclick="closeModal()" class="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-black/10 dark:bg-white/10 flex items-center justify-center hover:bg-amberAccent hover:text-white transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div class="p-6 sm:p-8 overflow-y-auto custom-scrollbar">
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-6">
+                    <div class="sm:col-span-5 flex flex-col items-center">
+                        <img id="modalCover" src="" class="w-48 aspect-[2/3] object-cover rounded-xl shadow-lg mb-4">
+                        <div class="w-full space-y-2">
+                            <select id="modalStatusSelect" onchange="changeBookStatus()" class="w-full px-3 py-2 text-xs font-semibold rounded-xl bg-paper-100 dark:bg-paper-900 border border-paper-200 dark:border-paper-700 focus:outline-none">
+                                <option value="none">Не прочитано</option>
+                                <option value="want">Хочу прочитать</option>
+                                <option value="reading">Читаю сейчас</option>
+                                <option value="read">Прочитано</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-7 space-y-4">
+                        <div>
+                            <span id="modalGenre" class="text-xs font-bold text-amberAccent uppercase tracking-widest">Жанр</span>
+                            <h3 id="modalTitle" class="text-2xl font-bold font-serif leading-tight mt-1">Название</h3>
+                            <p id="modalAuthor" class="text-sm font-semibold text-gray-500">Автор</p>
+                        </div>
+
+                        <div class="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 border-y border-paper-200 dark:border-paper-700 py-2">
+                            <span>Год: <strong id="modalYear" class="text-paper-800 dark:text-gray-200">1999</strong></span>
+                            <span>Страниц: <strong id="modalPages" class="text-paper-800 dark:text-gray-200">350</strong></span>
+                            <span>Рейтинг: <strong id="modalRating" class="text-amber-500">4.9 ★</strong></span>
+                        </div>
+
+                        <p id="modalDesc" class="text-sm leading-relaxed text-gray-600 dark:text-gray-300">Описание...</p>
+
+                        <div class="pt-2">
+                            <button id="modalWishlistBtn" onclick="toggleWishlistFromModal()" class="w-full py-3 rounded-xl bg-amberAccent text-white font-semibold hover:bg-amberAccent-hover transition-colors flex items-center justify-center gap-2">
+                                <i data-lucide="bookmark" class="w-4 h-4"></i>
+                                <span id="modalWishlistText">Добавить в избранное</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        const books = [
+            {
+                id: '1',
+                title: 'Мастер и Маргарита',
+                author: 'Михаил Булгаков',
+                genre: 'Классика',
+                rating: 4.9,
+                year: 1967,
+                pages: 480,
+                cover: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=600',
+                desc: 'Шедевр мировой литературы о визите Воланда в Москву 1930-х годов и великой любви Мастера и Маргариты.'
+            },
+            {
+                id: '2',
+                title: 'Дюна',
+                author: 'Фрэнк Герберт',
+                genre: 'Фантастика',
+                rating: 4.8,
+                year: 1965,
+                pages: 704,
+                cover: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&q=80&w=600',
+                desc: 'Эпическая сага о пустынной планете Арракис, ценной спайсе и судьбе Поля Атрейдеса.'
+            },
+            {
+                id: '3',
+                title: '1984',
+                author: 'Джордж Оруэлл',
+                genre: 'Антиутопия',
+                rating: 4.7,
+                year: 1949,
+                pages: 320,
+                cover: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=600',
+                desc: 'Классический роман о тоталитарном обществе, где за каждым шагом следит Большой Брат.'
+            },
+            {
+                id: '4',
+                title: 'Атомные привычки',
+                author: 'Джеймс Клир',
+                genre: 'Саморазвитие',
+                rating: 4.9,
+                year: 2018,
+                pages: 304,
+                cover: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=600',
+                desc: 'Проверенное руководство по изменению жизни на 1% каждый день.'
+            },
+            {
+                id: '5',
+                title: 'Убийство в Восточном экспрессе',
+                author: 'Агата Кристи',
+                genre: 'Детективы',
+                rating: 4.6,
+                year: 1934,
+                pages: 256,
+                cover: 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&q=80&w=600',
+                desc: 'Знаменитое расследование Эркюля Пуаро в застрявшем в снегу поезде.'
+            },
+            {
+                id: '6',
+                title: 'Властелин Колец',
+                author: 'Дж. Р. Р. Толкин',
+                genre: 'Фантастика',
+                rating: 4.9,
+                year: 1954,
+                pages: 1178,
+                cover: 'https://images.unsplash.com/photo-1629992101753-56d196c8aab5?auto=format&fit=crop&q=80&w=600',
+                desc: 'Великое фэнтези-путешествие Фродо Бэггинса с целью уничтожить Кольцо Всевластья.'
+            }
+        ];
+
+        const genres = ['Все', 'Классика', 'Фантастика', 'Антиутопия', 'Саморазвитие', 'Детективы'];
+
+        let currentGenre = 'Все';
+        let searchQuery = '';
+        let activeBookId = null;
+
+        // LocalStorage State
+        let wishlist = JSON.parse(localStorage.getItem('bl_wishlist') || '[]');
+        let bookStatuses = JSON.parse(localStorage.getItem('bl_statuses') || '{}');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            initTheme();
+            renderCategoryTabs();
+            renderCatalog();
+            renderWishlist();
+            updateGoalTracker();
+
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                searchQuery = e.target.value.toLowerCase();
+                renderCatalog();
+            });
+        });
+
+        // Theme Toggle
+        function initTheme() {
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+
+            document.getElementById('themeToggle').addEventListener('click', () => {
+                const isDark = document.documentElement.classList.toggle('dark');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            });
+        }
+
+        // Render Tabs
+        function renderCategoryTabs() {
+            const container = document.getElementById('categoryTabs');
+            container.innerHTML = genres.map(g => `
+                <button onclick="setGenre('${g}')" class="px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${
+                    currentGenre === g 
+                    ? 'bg-amberAccent text-white' 
+                    : 'bg-white dark:bg-paper-800 border border-paper-200 dark:border-paper-700 hover:border-amberAccent'
+                }">
+                    ${g}
+                </button>
+            `).join('');
+        }
+
+        function setGenre(g) {
+            currentGenre = g;
+            renderCategoryTabs();
+            renderCatalog();
+        }
+
+        // Render Catalog Grid
+        function renderCatalog() {
+            const grid = document.getElementById('booksGrid');
+            const filtered = books.filter(b => {
+                const matchGenre = currentGenre === 'Все' || b.genre === currentGenre;
+                const matchSearch = b.title.toLowerCase().includes(searchQuery) || b.author.toLowerCase().includes(searchQuery);
+                return matchGenre && matchSearch;
+            });
+
+            grid.innerHTML = filtered.map(b => {
+                const isSaved = wishlist.includes(b.id);
+                return `
+                <div class="bg-white dark:bg-paper-800 rounded-2xl p-4 border border-paper-200 dark:border-paper-700 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="aspect-[2/3] rounded-xl overflow-hidden mb-3 relative group">
+                            <img src="${b.cover}" alt="${b.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            <button onclick="openModal('${b.id}')" class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold backdrop-blur-[2px]">
+                                Подробнее
+                            </button>
+                        </div>
+                        <span class="text-[10px] font-bold text-amberAccent uppercase tracking-wider">${b.genre}</span>
+                        <h4 onclick="openModal('${b.id}')" class="font-serif font-bold text-base hover:text-amberAccent cursor-pointer line-clamp-1">${b.title}</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">${b.author}</p>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-paper-100 dark:border-paper-700 flex items-center justify-between">
+                        <span class="text-xs font-semibold text-amber-500">★ ${b.rating}</span>
+                        <button onclick="toggleWishlist('${b.id}')" class="p-2 text-gray-400 hover:text-amberAccent transition-colors">
+                            <i data-lucide="bookmark" class="w-4 h-4 ${isSaved ? 'fill-amberAccent text-amberAccent' : ''}"></i>
+                        </button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        // Wishlist System
+        function toggleWishlist(id) {
+            const idx = wishlist.indexOf(id);
+            if (idx > -1) wishlist.splice(idx, 1);
+            else wishlist.push(id);
+
+            localStorage.setItem('bl_wishlist', JSON.stringify(wishlist));
+            renderCatalog();
+            renderWishlist();
+        }
+
+        function renderWishlist() {
+            const badge = document.getElementById('wishlistCountBadge');
+            badge.textContent = wishlist.length;
+
+            const grid = document.getElementById('wishlistGrid');
+            const savedBooks = books.filter(b => wishlist.includes(b.id));
+
+            if (savedBooks.length === 0) {
+                grid.innerHTML = `<p class="col-span-full text-center text-sm text-gray-400 py-8">На вашей полке пока нет книг.</p>`;
+                return;
+            }
+
+            grid.innerHTML = savedBooks.map(b => `
+                <div class="flex gap-4 p-3 bg-white dark:bg-paper-800 rounded-2xl border border-paper-200 dark:border-paper-700 items-center">
+                    <img src="${b.cover}" class="w-12 h-16 object-cover rounded-lg">
+                    <div class="flex-1 min-w-0">
+                        <h5 class="font-serif font-bold text-sm truncate">${b.title}</h5>
+                        <p class="text-xs text-gray-400 truncate">${b.author}</p>
+                    </div>
+                    <button onclick="toggleWishlist('${b.id}')" class="p-2 text-gray-400 hover:text-red-500">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        // Reading Goal Tracker
+        function updateGoalTracker() {
+            const readCount = Object.values(bookStatuses).filter(s => s === 'read').length;
+            const target = 20;
+            const percent = Math.min(Math.round((readCount / target) * 100), 100);
+
+            document.getElementById('readCount').textContent = readCount;
+            document.getElementById('goalTarget').textContent = target;
+            document.getElementById('goalPercent').textContent = `${percent}%`;
+            document.getElementById('goalProgressBar').style.width = `${percent}%`;
+        }
+
+        // Modal Controls
+        function openModal(id) {
+            activeBookId = id;
+            const b = books.find(x => x.id === id);
+            if (!b) return;
+
+            document.getElementById('modalCover').src = b.cover;
+            document.getElementById('modalTitle').textContent = b.title;
+            document.getElementById('modalAuthor').textContent = b.author;
+            document.getElementById('modalGenre').textContent = b.genre;
+            document.getElementById('modalYear').textContent = b.year;
+            document.getElementById('modalPages').textContent = b.pages;
+            document.getElementById('modalRating').textContent = `${b.rating} ★`;
+            document.getElementById('modalDesc').textContent = b.desc;
+
+            // Status select
+            const status = bookStatuses[id] || 'none';
+            document.getElementById('modalStatusSelect').value = status;
+
+            updateModalWishlistBtn();
+            document.getElementById('bookModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('bookModal').classList.add('hidden');
+        }
+
+        function changeBookStatus() {
+            const val = document.getElementById('modalStatusSelect').value;
+            if (val === 'none') delete bookStatuses[activeBookId];
+            else bookStatuses[activeBookId] = val;
+
+            localStorage.setItem('bl_statuses', JSON.stringify(bookStatuses));
+            updateGoalTracker();
+        }
+
+        function toggleWishlistFromModal() {
+            toggleWishlist(activeBookId);
+            updateModalWishlistBtn();
+        }
+
+        function updateModalWishlistBtn() {
+            const isSaved = wishlist.includes(activeBookId);
+            document.getElementById('modalWishlistText').textContent = isSaved ? 'Удалить из избранного' : 'Добавить в избранное';
+        }
+    </script>
+</body>
+</html>
